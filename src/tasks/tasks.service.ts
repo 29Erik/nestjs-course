@@ -1,34 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Task } from './interfaces/Task';
+import { CreateTaskDto } from './dto/create-task.dto';
 
 @Injectable()
 export class TasksService {
-  tasks: Task[] = [
-    {
-      id: 1,
-      title: 'Aranjuez',
-      description: 'Alcolirycoz',
-      done: true,
-    },
-    {
-      id: 2,
-      title: 'Reflujo',
-      description: 'Alcolirycoz',
-      done: false,
-    },
-    {
-      id: 3,
-      title: 'Baldor',
-      description: 'Alcolirycoz',
-      done: true,
-    },
-  ];
+  constructor(@InjectModel('Task') private taskModel: Model<Task>) {}
 
-  getTasks(): Task[] {
-    return this.tasks;
+  async getTasks(): Promise<Task[]> {
+    return await this.taskModel.find();
   }
 
-  getTask(id: number): Task {
-    return this.tasks.find((task) => task.id === id);
+  async getTask(id: string): Promise<Task> {
+    return await this.taskModel.findById(id);
+  }
+
+  async createTask(task: CreateTaskDto): Promise<string> {
+    await this.taskModel.create(task);
+    return `Successful creation`;
+  }
+
+  async updateTask(id: string, task: CreateTaskDto): Promise<string> {
+    await this.taskModel.findByIdAndUpdate(id, task);
+    return `Updated Task`;
+  }
+
+  async deleteTask(id: string) {
+    return await this.taskModel.findByIdAndDelete(id);
   }
 }
