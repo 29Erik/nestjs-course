@@ -1,7 +1,7 @@
 import { Schema } from 'mongoose';
 
-export const TaskSchema = new Schema({
-  title: {
+export const ProductSchema = new Schema({
+  name: {
     type: String,
     required: true,
   },
@@ -9,8 +9,13 @@ export const TaskSchema = new Schema({
     type: String,
     required: true,
   },
-  done: {
+  imageURL: {
     type: String,
-    default: false,
+    required: true,
+  },
+  price: Number,
+  createdAt: {
+    type: Date,
+    default: Date.now(),
   },
 });
