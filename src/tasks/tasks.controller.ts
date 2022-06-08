@@ -8,6 +8,7 @@ import {
   Param,
   Res,
   HttpStatus,
+  NotFoundException,
 } from '@nestjs/common';
 //? DTO's
 import { CreateTaskDTO } from './dto/task.dto';
@@ -28,7 +29,7 @@ export class TasksController {
     const task = await this.taskService.createTask(createTaskDTO);
     return res.status(HttpStatus.OK).json({
       message: `Task ${createTaskDTO.title} created`,
-      task: task,
+      task,
     });
   }
 
@@ -37,16 +38,17 @@ export class TasksController {
     const tasks = await this.taskService.getTasks();
     return res.status(HttpStatus.OK).json({
       message: `N° of Tasks: ${tasks.length}`,
-      tasks: tasks,
+      tasks,
     });
   }
 
   @Get(':taskId')
   async getTask(@Res() res, @Param('taskId') taskId: string): Promise<Task> {
     const task = await this.taskService.getTask(taskId);
+    if (!task) throw new NotFoundException(`Task ${taskId} doesn't exist`);
     return res.status(HttpStatus.OK).json({
       message: `Task: ${task.title}`,
-      task: task,
+      task,
     });
   }
 
@@ -57,18 +59,22 @@ export class TasksController {
     @Body() updateTask: CreateTaskDTO,
   ): Promise<Task> {
     const updatedTask = await this.taskService.updateTask(taskId, updateTask);
+    if (!updatedTask)
+      throw new NotFoundException(`Task ${taskId} doesn't exist`);
     return res.status(HttpStatus.OK).json({
       message: `Task ${updatedTask.title} updated`,
-      updatedTask: updatedTask,
+      updatedTask,
     });
   }
 
   @Delete(`:taskId`)
   async deleteTask(@Res() res, @Param(`taskId`) taskId: string): Promise<Task> {
     const deletedTask = await this.taskService.deleteTask(taskId);
+    if (!deletedTask)
+      throw new NotFoundException(`Task ${taskId} doesn't exist`);
     return res.status(HttpStatus.OK).json({
       message: `Task ${deletedTask.title} deleted`,
-      deletedTask: deletedTask,
+      deletedTask,
     });
   }
 }
